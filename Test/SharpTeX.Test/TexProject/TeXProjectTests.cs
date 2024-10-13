@@ -77,16 +77,15 @@ public class TeXProjectTests
         // Arrange
         var title = "The Title";
         var author = "My Author";
-        var project = SharpTeX.TeXProject.TeXProject.CreateTeXProject(title, author);
-        var document = SharpTeX.TeXBlock.Document.Document.CreateDocument();
+
+        var document = SharpTeX.TeXBlock.Document.Document.CreateDocument().AddBlock(
+            SharpTeX.TeXBlock.ListBlock.ListBlock.NewItemize()
+                .AddItem("Item 1")
+                .AddItem("Item 2")
+        );
         
-        var listBlock = SharpTeX.TeXBlock.ListBlock.ListBlock.NewItemize()
-            .AddItem("Item 1")
-            .AddItem("Item 2");
-        
-        document.AddBlock(listBlock);
-        
-        project.AddDocument(document);
+        var project = SharpTeX.TeXProject.TeXProject.CreateTeXProject(title, author)
+            .AddDocument(document);
         
         var expected = @$"\documentclass{{article}}".NewLine()
                        + @"\usepackage[english]{babel}".NewLine()
