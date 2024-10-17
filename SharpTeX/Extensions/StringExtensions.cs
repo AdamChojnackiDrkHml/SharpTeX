@@ -22,8 +22,13 @@ internal static class StringExtensions
             .Aggregate((curr, next) => $"{curr}{Environment.NewLine}{next}");
     }
     
-    public static string JoinIfNotEmpty(this string str, string str2, string separator)
+    public static string? JoinIfNotEmpty(this string? str, string str2, string separator)
     {
         return string.IsNullOrWhiteSpace(str2) ? str : $"{str}{separator}{str2}";
+    }
+    
+    public static string? JoinNonEmpty(this IEnumerable<string> strings, string separator)
+    {
+        return string.Join(separator, strings.Where(s => !string.IsNullOrWhiteSpace(s)));
     }
 }

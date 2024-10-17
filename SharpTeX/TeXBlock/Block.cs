@@ -1,34 +1,41 @@
 using System.Text;
+using CSharpFunctionalExtensions;
 using SharpTeX.Extensions;
+using SharpTeX.Renderer;
+using SharpTeX.Renderer.Models;
 
 namespace SharpTeX.TeXBlock;
 
-public abstract class Block
+public abstract class Block : IRenderable
 {
     protected List<Block> Children { get; } = new();
 
     protected string BlockName;
     
-    protected abstract string RenderContent();
+    protected abstract Result<RenderedBlock> RenderContent(IRenderer renderer, RenderedBlock block);
 
-    public string Render()
+    public Result<RenderedBlock> Render(IRenderer renderer)
     {
-        var builder = new StringBuilder();
-        builder.AppendLine($@"\begin{{{BlockName}}}");
-        builder.AppendLine(RenderContent().IndentEachLine());
-        builder.Append($@"\end{{{BlockName}}}");
-
-        return builder.ToString();
+        var block = renderer.AddNamedBlock(BlockName);
+        return RenderContent(renderer, block);
     }
     
-    protected string RenderChildren()
+    protected Result<RenderedBlock> RenderChildren(IRenderer renderer, RenderedBlock block)
     {
-        var builder = new StringBuilder();
-        foreach (var child in Children)
+        var renderedBlocks = Children
+            .Select(child => child.Render(renderer))
+            .Collect();
+        
+        if (renderedBlocks.IsFailure)
         {
-            builder.Append(child.Render());
+            return Result.Failure<RenderedBlock>(renderedBlocks.Error);
         }
 
-        return builder.ToString();
+        foreach (var renderedChild in renderedBlocks.Value)
+        {
+            renderer.AddToBlock(block, renderedChild);
+        }
+        
+        return Result.Success(block);
     }
 }

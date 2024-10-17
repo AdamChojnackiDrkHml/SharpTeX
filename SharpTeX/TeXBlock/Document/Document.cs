@@ -1,12 +1,15 @@
 using System.Text;
+using CSharpFunctionalExtensions;
 using SharpTeX.Extensions;
+using SharpTeX.Renderer;
+using SharpTeX.Renderer.Models;
 
 namespace SharpTeX.TeXBlock.Document;
 
 public class Document : Block
 {
     // TODO add other Document block actions         
-
+    private List<string> DocumentPreContent = new();
 
     private Document(string blockName)
     {
@@ -21,22 +24,24 @@ public class Document : Block
         Children.Add(block);
         return this;
     }
-    
-    protected override string RenderContent()
+
+    public Document AddTitle()
     {
-        var lines = new List<string>();
-        
-        lines.Add(@"\maketitle");
-        
-        
-        var preContent = string.Join(Environment.NewLine, lines);
+        DocumentPreContent.Add(@"\maketitle");
+        return this;
+    }
+    
+    protected override Result<RenderedBlock> RenderContent(IRenderer renderer, RenderedBlock block)
+    {
+        var preContent = string.Join(Environment.NewLine, DocumentPreContent);
+        renderer.AddToBlock(block, preContent);
         // TODO: Add sections
 
-        var content = preContent.JoinIfNotEmpty(RenderChildren(), Environment.NewLine);
-        
-        // TODO: Add bibliography
+        var renderedContent = RenderChildren(renderer, block);
 
-        return content;
+        // TODO: Add bibliography
+        return renderedContent
+            .Map(content => renderer.AddToBlock(block, content));
     }
 
 

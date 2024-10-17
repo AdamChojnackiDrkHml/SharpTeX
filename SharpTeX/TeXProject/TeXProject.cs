@@ -1,10 +1,15 @@
 using System.Text;
 using CSharpFunctionalExtensions;
+using CSharpFunctionalExtensions.ValueTasks;
+using SharpTeX.Renderer;
+using SharpTeX.Renderer.Models;
+using SharpTeX.TeXBlock;
 using SharpTeX.TeXBlock.Document;
+using SharpTeX.TeXBlock.SimpleBlock.TextBlock;
 
 namespace SharpTeX.TeXProject;
 
-public class TeXProject
+public class TeXProject : IRenderable
 {
     private string _documentClass = "article";
 
@@ -40,24 +45,28 @@ public class TeXProject
         return this;
     }
     
-    public Result<string> Render()
+    public Result<RenderedBlock> Render(IRenderer renderer)
     {
         if (_document == null)
         {
-            return Result.Failure<string>("Document is not set.");
+            renderer.LogFailure("Document is not set.");
         }
-        
-        var builder = new StringBuilder();
-        
-        builder.AppendLine(@$"\documentclass{{{_documentClass}}}");
-        builder.AppendLine(@"\usepackage[english]{babel}");
-        builder.AppendLine(@"\usepackage[a4paper,top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}");
 
-        builder.AppendLine($@"\title{{{Title}}}");
-        builder.AppendLine(RenderAuthor());
-        builder.AppendLine(_document.Render());
+        var projectBlock = renderer.AddSimpleBlock();
         
-        return builder.ToString();
+        var textBlock = new TextBlock(@$"\documentclass{{{_documentClass}}}")
+            .Append(@"\usepackage[utf8]{inputenc}", Environment.NewLine)
+            .Append(@"\usepackage[english]{babel}", Environment.NewLine)
+            .Append(@"\usepackage[a4paper,top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}", Environment.NewLine)
+            .Append($@"\title{{{Title}}}", Environment.NewLine)
+            .Append(RenderAuthor(), Environment.NewLine);
+
+        var projectBlockRenderResult = textBlock.Render(renderer)
+            .Map(content => renderer.AddToBlock(projectBlock, content))
+            .Bind(_ => _document!.Render(renderer))
+            .Map(documentRender => renderer.AddToBlock(projectBlock, documentRender));
+
+        return projectBlockRenderResult;
     }
     
     private string RenderAuthor()
