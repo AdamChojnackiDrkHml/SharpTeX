@@ -1,5 +1,6 @@
 using System.Text;
 using CSharpFunctionalExtensions;
+using CSharpFunctionalExtensions.ValueTasks;
 using SharpTeX.Extensions;
 using SharpTeX.Renderer;
 using SharpTeX.Renderer.Models;
@@ -36,11 +37,6 @@ public class ListBlock : Block
     
     public ListBlock AddItems(IEnumerable<SimpleBlock.SimpleBlock> items)
     {
-        if (items is null)
-        {
-            throw new ArgumentNullException(nameof(items), "Argument Cannot Be Null");
-        }
-            
         if (items.Contains(null))
         {
             throw new ArgumentNullException(nameof(items), "Argument Cannot Contain Null");
@@ -68,8 +64,12 @@ public class ListBlock : Block
     
     protected override Result<RenderedBlock> RenderContent(IRenderer renderer, RenderedBlock block)
     {
-        Items.ForEach(item => renderer.AddToBlock(block, item.GetContent()));
-
-        return block;
+        return Items.Select(item => item.Render(renderer))
+            .Select(renderedItemResult => renderedItemResult
+                .Map(renderedItem => renderer.AddToBlock(block, renderedItem))
+            )
+            .Collect()
+            .Map(items => items.ToList())
+            .Map(_ => block);
     }
 }

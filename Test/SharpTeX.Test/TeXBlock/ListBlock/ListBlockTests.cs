@@ -17,7 +17,7 @@ public class ListBlockTests
     
     [Theory]
     [MemberData(nameof(SimpleBlocks), MemberType = typeof(ListBlockTestsData))]
-    public void AddItem_CorrectBlock_ReturnsCorrectBlock(SimpleBlock item)
+    public void AddItem_CorrectBlock_ReturnsCorrectBlock(SharpTeX.TeXBlock.SimpleBlock.SimpleBlock item)
     {
         // Arrange
         var listBlock = SharpTeX.TeXBlock.ListBlock.ListBlock.NewItemize();
@@ -35,10 +35,10 @@ public class ListBlockTests
     {
         // Arrange
         var listBlock = SharpTeX.TeXBlock.ListBlock.ListBlock.NewItemize();
-        var items = new List<SimpleBlock>
+        var items = new List<SharpTeX.TeXBlock.SimpleBlock.SimpleBlock>
         {
-            new TextBlock("Text1"),
-            new TextBlock("Text2")
+            TextBlock.CreateTextBlock("Text1"),
+            TextBlock.CreateTextBlock("Text2")
         };
         
         // Act
@@ -51,7 +51,7 @@ public class ListBlockTests
     
     [Theory]
     [MemberData(nameof(Strings), MemberType = typeof(ListBlockTestsData))]
-    public void AddItem_Strings_ReturnsCorrectBlock(string item, SimpleBlock expected)
+    public void AddItem_Strings_ReturnsCorrectBlock(string item, SharpTeX.TeXBlock.SimpleBlock.SimpleBlock expected)
     {
         // Arrange
         var listBlock = SharpTeX.TeXBlock.ListBlock.ListBlock.NewItemize();
@@ -73,7 +73,7 @@ public class ListBlockTests
         var listBlock = SharpTeX.TeXBlock.ListBlock.ListBlock.NewItemize();
         var items = new List<string> {"Text1", "Text2"};
         var expected = items
-            .Select(item => new TextBlock(item));
+            .Select(item => TextBlock.CreateTextBlock(item));
         
         // Act
         var listBlockRef = listBlock.AddItems(items);
@@ -88,9 +88,13 @@ public class ListBlockTests
     [MemberData(nameof(DifferentObjectsWithMappers), MemberType = typeof(ListBlockTestsData))]
     public void AddItem_DifferentObjectsWithMappers_ReturnsCorrectBlock<T>(
         T item,
-        Func<T, SimpleBlock> textMapper,
-        SimpleBlock expected)
+        Func<T, SharpTeX.TeXBlock.SimpleBlock.SimpleBlock> textMapper,
+        SharpTeX.TeXBlock.SimpleBlock.SimpleBlock expected)
     {
+        if (expected == null)
+            throw new ArgumentNullException(nameof(expected));
+
+
         // Arrange
         var listBlock = SharpTeX.TeXBlock.ListBlock.ListBlock.NewItemize();
         
@@ -112,10 +116,10 @@ public class ListBlockTests
         var items = new List<object> {1234, DateTime.Today.Date, new {Name = "Adam", Index = 1234}};
 
         var expected = items
-            .Select(item => new TextBlock(item.ToString()));
+            .Select(item => TextBlock.CreateTextBlock(item.ToString()));
         
         // Act
-        var listBlockRef = listBlock.AddItems(items, item => new TextBlock(item.ToString()));
+        var listBlockRef = listBlock.AddItems(items, item => TextBlock.CreateTextBlock(item.ToString()));
         
         // Assert
         listBlockRef.ShouldBeSameInstanceAs(listBlock);
@@ -130,7 +134,7 @@ public class ListBlockTests
     {
         // Arrange
         var listBlock = SharpTeX.TeXBlock.ListBlock.ListBlock.NewItemize();
-        var mapper = new Func<object, SimpleBlock>(o => null);
+        var mapper = new Func<object, SharpTeX.TeXBlock.SimpleBlock.SimpleBlock>(o => null);
         
         // Act
         Action act = () => listBlock.AddItem(1234, mapper);
@@ -144,7 +148,7 @@ public class ListBlockTests
     {
         // Arrange
         var listBlock = SharpTeX.TeXBlock.ListBlock.ListBlock.NewItemize();
-        var mapper = new Func<object, SimpleBlock>(o => null);
+        var mapper = new Func<object, SharpTeX.TeXBlock.SimpleBlock.SimpleBlock>(o => null);
         
         // Act
         Action act = () => listBlock.AddItems(new List<object> {1234}, mapper);

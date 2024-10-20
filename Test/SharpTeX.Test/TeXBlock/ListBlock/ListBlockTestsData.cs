@@ -7,14 +7,14 @@ public static class ListBlockTestsData
 {
     public readonly static List<object[]> SimpleBlocks =
     [
-        new object[] {new TextBlock("Text1")},
-        new object[] {new TextBlock()}
+        new object[] {TextBlock.CreateTextBlock("Text1")},
+        new object[] {TextBlock.CreateTextBlock()}
     ];
     
     public readonly static List<object?[]> Strings =
     [
-        new object[] {"Text1", new TextBlock("Text1")},
-        new object[] {"Text2", new TextBlock("Text2")},
+        new object[] {"Text1", TextBlock.CreateTextBlock("Text1")},
+        new object[] {"Text2", TextBlock.CreateTextBlock("Text2")},
     ];
 
     public readonly static List<object?[]> DifferentObjectsWithMappers =
@@ -22,14 +22,14 @@ public static class ListBlockTestsData
         new object[]
         {
             1234, 
-            new Func<int, SimpleBlock>(i => new TextBlock(i.ToString())), 
-            new TextBlock("1234")
+            new Func<int, SharpTeX.TeXBlock.SimpleBlock.SimpleBlock>(i => TextBlock.CreateTextBlock(i.ToString())), 
+            TextBlock.CreateTextBlock("1234")
         },
         new object[]
         {
             DateTime.Today.Date,
-            new Func<DateTime, SimpleBlock>(d => new TextBlock(d.ToString("yyyy-MM-dd"))),
-            new TextBlock(DateTime.Today.Date.ToString("yyyy-MM-dd"))
+            new Func<DateTime, SharpTeX.TeXBlock.SimpleBlock.SimpleBlock>(d => TextBlock.CreateTextBlock(d.ToString("yyyy-MM-dd"))),
+            TextBlock.CreateTextBlock(DateTime.Today.Date.ToString("yyyy-MM-dd"))
         }        
     ];
     

@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Text;
 using CSharpFunctionalExtensions;
 using SharpTeX.Extensions;
@@ -10,32 +11,23 @@ public abstract class Block : IRenderable
 {
     protected List<Block> Children { get; } = new();
 
-    protected string BlockName;
-    
+    public string BlockName { get; protected init; } = null!;
+
     protected abstract Result<RenderedBlock> RenderContent(IRenderer renderer, RenderedBlock block);
 
-    public Result<RenderedBlock> Render(IRenderer renderer)
+    public ReadOnlyCollection<Block> GetChildren() => Children.AsReadOnly();
+
+    public virtual Result<RenderedBlock> Render(IRenderer renderer)
     {
         var block = renderer.AddNamedBlock(BlockName);
         return RenderContent(renderer, block);
     }
     
-    protected Result<RenderedBlock> RenderChildren(IRenderer renderer, RenderedBlock block)
+    protected Result<List<RenderedBlock>> RenderChildren(IRenderer renderer)
     {
-        var renderedBlocks = Children
+        return Children
             .Select(child => child.Render(renderer))
-            .Collect();
-        
-        if (renderedBlocks.IsFailure)
-        {
-            return Result.Failure<RenderedBlock>(renderedBlocks.Error);
-        }
-
-        foreach (var renderedChild in renderedBlocks.Value)
-        {
-            renderer.AddToBlock(block, renderedChild);
-        }
-        
-        return Result.Success(block);
+            .Collect()
+            .Map(children => children.ToList());
     }
 }

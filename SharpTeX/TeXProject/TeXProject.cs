@@ -54,7 +54,7 @@ public class TeXProject : IRenderable
 
         var projectBlock = renderer.AddSimpleBlock();
         
-        var textBlock = new TextBlock(@$"\documentclass{{{_documentClass}}}")
+        var textBlock = TextBlock.CreateTextBlock(@$"\documentclass{{{_documentClass}}}")
             .Append(@"\usepackage[utf8]{inputenc}", Environment.NewLine)
             .Append(@"\usepackage[english]{babel}", Environment.NewLine)
             .Append(@"\usepackage[a4paper,top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}", Environment.NewLine)

@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Text;
 using CSharpFunctionalExtensions;
 using SharpTeX.Extensions;
@@ -9,15 +10,14 @@ namespace SharpTeX.TeXBlock.Document;
 public class Document : Block
 {
     // TODO add other Document block actions         
-    private List<string> DocumentPreContent = new();
+    private readonly List<string> _documentPreContent = [];
 
-    private Document(string blockName)
+    private Document()
     {
-        BlockName = blockName;
+        BlockName = "document";
     }
 
-    public static Document CreateDocument()
-        => new Document("document");
+    public static Document CreateDocument() => new();
     
     public Document AddBlock(Block block)
     {
@@ -27,21 +27,25 @@ public class Document : Block
 
     public Document AddTitle()
     {
-        DocumentPreContent.Add(@"\maketitle");
+        _documentPreContent.Add(@"\maketitle");
         return this;
     }
     
+    public ReadOnlyCollection<string> GetDocumentPreContent() 
+        => _documentPreContent.AsReadOnly();
+
     protected override Result<RenderedBlock> RenderContent(IRenderer renderer, RenderedBlock block)
     {
-        var preContent = string.Join(Environment.NewLine, DocumentPreContent);
+        var preContent = string.Join(Environment.NewLine, _documentPreContent);
         renderer.AddToBlock(block, preContent);
         // TODO: Add sections
-
-        var renderedContent = RenderChildren(renderer, block);
-
         // TODO: Add bibliography
-        return renderedContent
-            .Map(content => renderer.AddToBlock(block, content));
+        
+        
+        return RenderChildren(renderer)
+            .Tap(children => children
+                .ForEach(child => renderer.AddToBlock(block, child)))
+            .Map(_ => block);
     }
 
 
