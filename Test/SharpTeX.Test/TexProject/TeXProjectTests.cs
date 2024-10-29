@@ -1,6 +1,7 @@
 using FluentAssert;
 using FluentAssertions;
 using FluentAssertions.CSharpFunctionalExtensions;
+using Microsoft.Extensions.Logging;
 using Moq;
 using SharpTeX.Extensions;
 using SharpTeX.Renderer;
@@ -16,7 +17,8 @@ public class TeXProjectTests
     public void AddAuthor_AuthorNotSet_AuthorIsSet()
     {
         // Arrange
-        var project = TeXProject.TeXProject.CreateTeXProject("Title");
+        var logger = new Mock<ILogger>();
+        var project = TeXProject.TeXProject.CreateTeXProject("Title", logger.Object);
         var author = "Author";
 
         // Act
@@ -31,7 +33,8 @@ public class TeXProjectTests
     public void AddAuthor_AuthorSet_AuthorIsChanged()
     {
         // Arrange
-        var project = TeXProject.TeXProject.CreateTeXProject("Title", "Author");
+        var logger = new Mock<ILogger>();
+        var project = TeXProject.TeXProject.CreateTeXProject("Title", logger.Object, "Author");
         var author = "New Author";
 
         // Act
@@ -46,7 +49,8 @@ public class TeXProjectTests
     public void SetDocumentClass_DefaultDocumentClassSet_DocumentClassIsChanged()
     {
         // Arrange
-        var project = TeXProject.TeXProject.CreateTeXProject("Title");
+        var logger = new Mock<ILogger>();
+        var project = TeXProject.TeXProject.CreateTeXProject("Title", logger.Object);
         var documentClass = "presentation";
 
         // Act
@@ -61,7 +65,8 @@ public class TeXProjectTests
     public void AddDocument_NoDocumentSet_DocumentIsSet()
     {
         // Arrange
-        var project = TeXProject.TeXProject.CreateTeXProject("Title");
+        var logger = new Mock<ILogger>();
+        var project = TeXProject.TeXProject.CreateTeXProject("Title", logger.Object);
         var document = Document.CreateDocument();
 
         // Act
@@ -76,7 +81,8 @@ public class TeXProjectTests
     public void Render_EmptyProject_FailureLogged()
     {
         // Arrange
-        var project = TeXProject.TeXProject.CreateTeXProject("Title");
+        var logger = new Mock<ILogger>();
+        var project = TeXProject.TeXProject.CreateTeXProject("Title", logger.Object);
         var renderer = new Mock<IRenderer>();
 
         // Act
@@ -84,13 +90,15 @@ public class TeXProjectTests
 
         // Assert
         res.IsSuccess.Should().BeFalse();
-        renderer.Verify(mock => mock.LogFailure("Document is not set."), Times.Once);
+        logger.Verify(mock => mock.LogError("TeXProject: Document is not set."), Times.Once);
     }
 
     [Fact]
     public void Render_ProjectWithDocument_Success()
     {
-        var project = TeXProject.TeXProject.CreateTeXProject("TitleOfDocument");
+        // Arrange
+        var logger = new Mock<ILogger>();
+        var project = TeXProject.TeXProject.CreateTeXProject("TitleOfDocument", logger.Object);
         var renderer = new Mock<IRenderer>();
         var document = Document.CreateDocument()
             .AddBlock(

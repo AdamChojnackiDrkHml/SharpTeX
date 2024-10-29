@@ -1,6 +1,7 @@
 using System.Text;
 using CSharpFunctionalExtensions;
 using CSharpFunctionalExtensions.ValueTasks;
+using Microsoft.Extensions.Logging;
 using SharpTeX.Renderer;
 using SharpTeX.Renderer.Models;
 using SharpTeX.TeXBlock;
@@ -12,19 +13,28 @@ namespace SharpTeX.TeXProject;
 public class TeXProject : IRenderable
 {
     public string DocumentClass { get; private set; } = "article"; 
+    
     public string Title { get; private set; }
+    
     public string? Author { get; private set; }
     
     public Document? Document { get; private set; }
     
-    private TeXProject(string title, string? author)
+    private readonly ILogger _logger;
+    
+    private TeXProject(
+        string title, 
+        string? author,
+        ILogger logger
+    )
     {
         Title = title;
         Author = author;
+        _logger = logger;
     }
 
-    public static TeXProject CreateTeXProject(string title, string? author = null)
-        => new TeXProject(title, author);
+    public static TeXProject CreateTeXProject(string title, ILogger logger, string? author = null) 
+        => new(title, author, logger);
 
     public TeXProject ChangeAuthor(string author)
     {
@@ -48,11 +58,13 @@ public class TeXProject : IRenderable
     {
         if (Document == null)
         {
-            renderer.LogFailure("Document is not set.");
+            _logger.LogError("TeXProject: Document is not set.");
             return Result.Failure<RenderedBlock>("Document is not set.");
         }
 
         var projectBlock = renderer.AddSimpleBlock();
+        
+        renderer.SetRootBlock(projectBlock);
         
         var textBlock = TextBlock.CreateTextBlock(@$"\documentclass{{{DocumentClass}}}")
             .Append(@"\usepackage[utf8]{inputenc}", Environment.NewLine)

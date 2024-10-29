@@ -13,9 +13,9 @@ public interface IRenderer
     
     RenderedBlock AddToBlock(RenderedBlock block, RenderedBlock content);
     
-    RenderedBlock AddBlock(string content);
-    
     Result<string> Render();
+    
+    void SetRootBlock(RenderedBlock block);
     
     void LogFailure(string message);
 }

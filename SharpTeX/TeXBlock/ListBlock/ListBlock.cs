@@ -64,7 +64,9 @@ public class ListBlock : Block
     
     protected override Result<RenderedBlock> RenderContent(IRenderer renderer, RenderedBlock block)
     {
-        return Items.Select(item => item.Render(renderer))
+        return Items
+            .Select(item => item.SetContent(@$"\item {item.GetContent()}"))
+            .Select(item => item.Render(renderer))
             .Select(renderedItemResult => renderedItemResult
                 .Map(renderedItem => renderer.AddToBlock(block, renderedItem))
             )

@@ -32,10 +32,17 @@ public class TextBlock : SimpleBlock
     }
 
     public override string GetContent() => Content;
+    
+    public override TextBlock SetContent(string content)
+    {
+        var newBlock = CreateTextBlock(content);
+        return newBlock;
+    }
 
     public TextBlock Append(string content, string separator = "")
     {
         this.Content += separator + content;
         return this;
     }
+    
 }
