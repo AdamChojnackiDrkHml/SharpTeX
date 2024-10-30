@@ -2,7 +2,6 @@ using FluentAssert;
 using FluentAssertions;
 using Moq;
 using SharpTeX.Renderer;
-using SharpTeX.Renderer.Models;
 using TBlock = SharpTeX.TeXBlock.SimpleBlock.TextBlock.TextBlock;
 namespace SharpTeX.Test.TeXBlock.SimpleBlock.TextBlock;
 

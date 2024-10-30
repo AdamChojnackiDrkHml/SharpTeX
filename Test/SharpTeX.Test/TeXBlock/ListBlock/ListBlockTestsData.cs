@@ -1,4 +1,3 @@
-using SharpTeX.TeXBlock.SimpleBlock;
 using SharpTeX.TeXBlock.SimpleBlock.TextBlock;
 
 namespace SharpTeX.Test.TeXBlock.ListBlock;

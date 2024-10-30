@@ -1,7 +1,6 @@
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SharpTeX.Logging;
 using SharpTeX.Renderer.Enums;
 using SharpTeX.Renderer.Models;
 using SharpTeX.TeXBlock.Document;

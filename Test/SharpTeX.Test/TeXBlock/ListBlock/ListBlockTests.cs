@@ -1,12 +1,9 @@
 using FluentAssert;
 using FluentAssertions;
-using FluentAssertions.CSharpFunctionalExtensions;
 using Moq;
 using SharpTeX.Renderer;
 using SharpTeX.Renderer.Models;
-using SharpTeX.TeXBlock.SimpleBlock;
 using SharpTeX.TeXBlock.SimpleBlock.TextBlock;
-using static SharpTeX.Extensions.StringExtensions;
 using static SharpTeX.Test.TeXBlock.ListBlock.ListBlockTestsData;
 
 namespace SharpTeX.Test.TeXBlock.ListBlock;

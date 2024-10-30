@@ -1,9 +1,7 @@
 using FluentAssert;
 using FluentAssertions;
-using FluentAssertions.CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SharpTeX.Extensions;
 using SharpTeX.Renderer;
 using SharpTeX.Renderer.Models;
 using SharpTeX.TeXBlock.Document;
@@ -12,6 +10,7 @@ using static SharpTeX.Test.Utilities.LoggerUtilities;
 
 namespace SharpTeX.Test.TexProject;
 
+//TODO: Add integration tests for all Block components
 public class TeXProjectTests
 {
     [Fact]
@@ -130,7 +129,5 @@ public class TeXProjectTests
         renderer.Verify(mock => mock.AddNamedBlock("itemize", null), Times.Once);
         renderer.Verify(mock => mock.AddSimpleBlock(It.IsAny<string>()), Times.Exactly(4));
         renderer.VerifyNoOtherCalls();
-
     }
-
 }

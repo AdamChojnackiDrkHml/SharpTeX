@@ -2,10 +2,8 @@ using System.Collections.ObjectModel;
 using FluentAssert;
 using FluentAssertions;
 using Moq;
-using SharpTeX.Extensions;
 using SharpTeX.Renderer;
 using SharpTeX.Renderer.Models;
-using SharpTeX.TeXBlock.Document;
 using SharpTeX.TeXBlock.SimpleBlock.TextBlock;
 
 namespace SharpTeX.Test.TeXBlock.Document;
