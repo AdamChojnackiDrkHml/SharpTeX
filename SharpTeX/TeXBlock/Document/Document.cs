@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Text;
+using System.Threading.Tasks.Dataflow;
 using CSharpFunctionalExtensions;
 using SharpTeX.Extensions;
 using SharpTeX.Renderer;
@@ -37,15 +38,13 @@ public class Document : Block
     protected override Result<RenderedBlock> RenderContent(IRenderer renderer, RenderedBlock block)
     {
         var preContent = string.Join(Environment.NewLine, _documentPreContent);
-        renderer.AddToBlock(block, preContent);
+        block = renderer.AddToBlock(block, preContent);
         // TODO: Add sections
         // TODO: Add bibliography
-        
-        
+
         return RenderChildren(renderer)
-            .Tap(children => children
-                .ForEach(child => renderer.AddToBlock(block, child)))
-            .Map(_ => block);
+            .Map(children => children
+                .Aggregate(block, renderer.AddToBlock));
     }
 
 

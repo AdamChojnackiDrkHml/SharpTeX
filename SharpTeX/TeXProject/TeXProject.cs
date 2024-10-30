@@ -2,6 +2,7 @@ using System.Text;
 using CSharpFunctionalExtensions;
 using CSharpFunctionalExtensions.ValueTasks;
 using Microsoft.Extensions.Logging;
+using SharpTeX.Extensions;
 using SharpTeX.Renderer;
 using SharpTeX.Renderer.Models;
 using SharpTeX.TeXBlock;
@@ -63,26 +64,32 @@ public class TeXProject : IRenderable
         }
 
         var projectBlock = renderer.AddSimpleBlock();
-        
         renderer.SetRootBlock(projectBlock);
-        
-        var textBlock = TextBlock.CreateTextBlock(@$"\documentclass{{{DocumentClass}}}")
-            .Append(@"\usepackage[utf8]{inputenc}", Environment.NewLine)
-            .Append(@"\usepackage[english]{babel}", Environment.NewLine)
-            .Append(@"\usepackage[a4paper,top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}", Environment.NewLine)
-            .Append($@"\title{{{Title}}}", Environment.NewLine)
-            .Append(RenderAuthor(), Environment.NewLine);
 
-        var projectBlockRenderResult = textBlock.Render(renderer)
-            .Map(content => renderer.AddToBlock(projectBlock, content))
-            .Bind(_ => Document!.Render(renderer))
-            .Map(documentRender => renderer.AddToBlock(projectBlock, documentRender));
+        var headerBlock = CreateHeaderBlock();
 
-        return projectBlockRenderResult;
+        var blocksToRender = new List<Block>{headerBlock, Document};
+
+        return blocksToRender.Select(block => block.Render(renderer))
+            .Collect()
+            .Map(renders =>
+                renders.Aggregate(projectBlock, renderer.AddToBlock));
     }
     
     private string RenderAuthor()
     {
         return string.IsNullOrWhiteSpace(Author) ? string.Empty : $@"\author{{{Author}}}";
+    }
+    
+    private TextBlock CreateHeaderBlock()
+    {
+        var header = TextBlock.CreateTextBlock(@$"\documentclass{{{DocumentClass}}}")
+            .Append(@"\usepackage[utf8]{inputenc}", Environment.NewLine)
+            .Append(@"\usepackage[english]{babel}", Environment.NewLine)
+            .Append(@"\usepackage[a4paper,top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}", Environment.NewLine)
+            .Append($@"\title{{{Title}}}", Environment.NewLine)
+            .Append(RenderAuthor(), Environment.NewLine);
+        
+        return header;
     }
 }

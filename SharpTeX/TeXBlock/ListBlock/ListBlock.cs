@@ -67,11 +67,8 @@ public class ListBlock : Block
         return Items
             .Select(item => item.SetContent(@$"\item {item.GetContent()}"))
             .Select(item => item.Render(renderer))
-            .Select(renderedItemResult => renderedItemResult
-                .Map(renderedItem => renderer.AddToBlock(block, renderedItem))
-            )
             .Collect()
-            .Map(items => items.ToList())
-            .Map(_ => block);
+            .Map(rendererItems => rendererItems
+                .Aggregate(block, renderer.AddToBlock));
     }
 }

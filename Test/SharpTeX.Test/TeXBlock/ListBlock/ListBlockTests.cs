@@ -196,8 +196,8 @@ public class ListBlockTests
         result.IsSuccess.Should().BeTrue();
         renderer.Verify(x => x.AddNamedBlock(listType, It.IsAny<string?>()), Times.Once);
         renderer.Verify(x => x.AddSimpleBlock(null), Times.Exactly(2));
-        renderer.Verify(x => x.AddToBlock(It.IsAny<RenderedBlock>(), "Item 1"));
-        renderer.Verify(x => x.AddToBlock(It.IsAny<RenderedBlock>(), "Item 2"));
+        renderer.Verify(x => x.AddToBlock(It.IsAny<RenderedBlock>(), "\\item Item 1"));
+        renderer.Verify(x => x.AddToBlock(It.IsAny<RenderedBlock>(), "\\item Item 2"));
         renderer.Verify(x => x.AddToBlock(It.IsAny<RenderedBlock>(), It.IsAny<RenderedBlock>()), Times.Exactly(2));
         renderer.VerifyNoOtherCalls();
     }

@@ -108,13 +108,8 @@ public class Renderer : IRenderer
         var contentBuilder = new StringBuilder();
         
         _logger.LogInformation($"Renderer: Rendering block '{block.BlockName}' with id '{block.BlockId}'.");
-        contentBuilder.AppendLine($"\\begin{{{block.BlockName}}}");
-        contentBuilder.AppendLine(block.Content);
-        foreach (var childBlock in block.Children)
-        {
-            contentBuilder.AppendLine(RenderBlock(childBlock));
-            _logger.LogInformation($"Renderer: Block: '{block.BlockId}' Finished rendering child with id '{childBlock.BlockId}'");
-        }
+        contentBuilder.AppendLine($"\\begin{{{block.BlockName}}}"); 
+        contentBuilder.Append(RenderBlockContent(block));
         contentBuilder.AppendLine($"\\end{{{block.BlockName}}}");
         _logger.LogInformation($"Renderer: Finished rendering block '{block.BlockName}' with id '{block.BlockId}'.");
         
@@ -124,10 +119,10 @@ public class Renderer : IRenderer
     private string RenderSimpleBlock(RenderedBlock block)
     {
         _logger.LogInformation($"Renderer: Rendering simple block with id '{block.BlockId}'.");
-        var render = block.Content;
+        var renderedContent = RenderBlockContent(block);
         _logger.LogInformation($"Renderer: Finished rendering simple block with id '{block.BlockId}'.");
-        
-        return render;
+
+        return renderedContent;
     }
     
     private string RenderBlock(RenderedBlock block)
@@ -156,4 +151,26 @@ public class Renderer : IRenderer
         _logger.LogInformation($"Renderer: Updating root block with id '{block.BlockId}'.");
         SetRootBlock(block);
     }
+
+    private string RenderBlockContent(RenderedBlock block)
+    {
+        var contentBuilder = new StringBuilder();
+        if (!string.IsNullOrWhiteSpace(block.Content))
+        {
+            contentBuilder.AppendLine(block.Content);
+        }
+        RenderChildrenBlocks(block, contentBuilder);
+        return contentBuilder.ToString();
+    }
+    
+    private void RenderChildrenBlocks(RenderedBlock block, StringBuilder contentBuilder)
+    {
+        foreach (var childBlock in block.Children)
+        {
+            contentBuilder.Append(RenderBlock(childBlock));
+            _logger.LogInformation($"Renderer: Block: '{block.BlockId}' Finished rendering child with id '{childBlock.BlockId}'");
+        }
+    }
+    
+    
 }

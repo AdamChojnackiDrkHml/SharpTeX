@@ -130,7 +130,7 @@ public class DocumentTests
         mock.Verify(x => x.AddNamedBlock(document.BlockName, null), Times.Once);
         mock.Verify(x => x.AddToBlock(result.Value, @"\maketitle"), Times.Once);
         mock.Verify(x => x.AddNamedBlock(listBlock.BlockName, null), Times.Once);
-        mock.Verify(x => x.AddToBlock(result.Value, "TextBlock1"), Times.Once);
+        mock.Verify(x => x.AddToBlock(result.Value, "\\item TextBlock1"), Times.Once);
         mock.Verify(x => x.AddToBlock(It.IsAny<RenderedBlock>(), "TextBlock2"), Times.Once);
         mock.Verify(x => x.AddSimpleBlock(null), Times.Exactly(2));
         mock.Verify(x => x.AddToBlock(result.Value, It.IsAny<RenderedBlock>()), Times.Exactly(3));

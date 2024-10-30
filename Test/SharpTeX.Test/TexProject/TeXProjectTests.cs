@@ -8,6 +8,7 @@ using SharpTeX.Renderer;
 using SharpTeX.Renderer.Models;
 using SharpTeX.TeXBlock.Document;
 using SharpTeX.TeXBlock.ListBlock;
+using static SharpTeX.Test.Utilities.LoggerUtilities;
 
 namespace SharpTeX.Test.TexProject;
 
@@ -90,7 +91,7 @@ public class TeXProjectTests
 
         // Assert
         res.IsSuccess.Should().BeFalse();
-        logger.Verify(mock => mock.LogError("TeXProject: Document is not set."), Times.Once);
+        VerifyLog(logger, LogLevel.Error, "TeXProject: Document is not set.", Times.Once());
     }
 
     [Fact]
@@ -118,10 +119,11 @@ public class TeXProjectTests
         
         // Assert
         res.IsSuccess.Should().BeTrue();
+        renderer.Verify(mock => mock.SetRootBlock(It.IsAny<RenderedBlock>()));
         renderer.Verify(mock => mock.AddSimpleBlock(null), Times.Exactly(4));
-        renderer.Verify(mock => mock.AddToBlock(It.IsAny<RenderedBlock>(), "Item 1"), Times.Once);
+        renderer.Verify(mock => mock.AddToBlock(It.IsAny<RenderedBlock>(), "\\item Item 1"), Times.Once);
         renderer.Verify(mock => mock.AddToBlock(It.IsAny<RenderedBlock>(), "\\maketitle"), Times.Once);
-        renderer.Verify(mock => mock.AddToBlock(It.IsAny<RenderedBlock>(), "Item 2"), Times.Once);
+        renderer.Verify(mock => mock.AddToBlock(It.IsAny<RenderedBlock>(), "\\item Item 2"), Times.Once);
         renderer.Verify(mock => mock.AddToBlock(It.IsAny<RenderedBlock>(), preambule), Times.Once);
         renderer.Verify(mock => mock.AddToBlock(null, (RenderedBlock?)null), Times.Exactly(5));
         renderer.Verify(mock => mock.AddNamedBlock("document", null), Times.Once);
